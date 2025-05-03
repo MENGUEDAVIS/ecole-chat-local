@@ -60,7 +60,8 @@ const Index = () => {
   const handleSendMessage = (
     conversationId: string,
     content: string,
-    attachments?: File[]
+    attachments?: File[],
+    type: "text" | "voice" | "emoji" = "text"
   ) => {
     const now = new Date();
     const newMessage: Message = {
@@ -69,18 +70,25 @@ const Index = () => {
       senderId: currentUser.id,
       timestamp: now.toISOString(),
       status: isConnected ? "sent" : "pending",
+      type,
       attachments: attachments
-        ? attachments.map((file, index) => ({
-            id: `attach-${now.getTime()}-${index}`,
-            name: file.name,
-            type: file.type.startsWith("image/")
-              ? "image"
-              : file.type.startsWith("application/")
-                ? "document"
-                : "other",
-            url: "#",
-            size: `${Math.round(file.size / 1024)} KB`,
-          }))
+        ? attachments.map((file, index) => {
+            const isVoice = file.type.startsWith("audio/");
+            return {
+              id: `attach-${now.getTime()}-${index}`,
+              name: file.name,
+              type: file.type.startsWith("image/")
+                ? "image"
+                : isVoice
+                  ? "voice"
+                  : file.type.startsWith("application/")
+                    ? "document"
+                    : "other",
+              url: URL.createObjectURL(file), // Pour la prévisualisation locale
+              size: `${Math.round(file.size / 1024)} KB`,
+              duration: isVoice ? Math.floor(Math.random() * 30) + 5 : undefined, // Simulation pour les messages vocaux
+            };
+          })
         : undefined,
     };
 
@@ -105,8 +113,57 @@ const Index = () => {
     }
   };
   
+  // Handle pinning a message
+  const handlePinMessage = (conversationId: string, messageId: string) => {
+    setConversations(
+      conversations.map((conv) => {
+        if (conv.id !== conversationId) return conv;
+        
+        const messageIndex = conv.messages.findIndex(msg => msg.id === messageId);
+        if (messageIndex === -1) return conv;
+        
+        const updatedMessages = [...conv.messages];
+        const message = updatedMessages[messageIndex];
+        
+        // Toggle pinned status
+        updatedMessages[messageIndex] = {
+          ...message,
+          isPinned: !message.isPinned
+        };
+        
+        // Update pinnedMessages collection
+        let pinnedMessages = conv.pinnedMessages || [];
+        
+        if (message.isPinned) {
+          // If it was pinned and we're unpinning it
+          pinnedMessages = pinnedMessages.filter(msg => msg.id !== messageId);
+        } else {
+          // If it wasn't pinned and we're pinning it
+          pinnedMessages = [...pinnedMessages, {...updatedMessages[messageIndex], isPinned: true}];
+        }
+        
+        return {
+          ...conv,
+          messages: updatedMessages,
+          pinnedMessages
+        };
+      })
+    );
+    
+    toast({
+      title: "Message épinglé",
+      description: "Le message a été épinglé dans la conversation.",
+    });
+  };
+  
   // Handle creating a new group
-  const handleCreateGroup = (name: string, participants: User[]) => {
+  const handleCreateGroup = (
+    name: string, 
+    participants: User[], 
+    category: "project" | "club" | "class" | "other",
+    visibility: "private" | "public" | "moderated",
+    description?: string
+  ) => {
     const now = new Date();
     const newGroupId = `c${conversations.length + 1}`;
     
@@ -114,10 +171,14 @@ const Index = () => {
       id: newGroupId,
       type: "group",
       name: name,
-      participants: participants,
+      participants: [...participants, currentUser], // Include current user
       messages: [],
       unreadCount: 0,
       avatar: "",
+      category,
+      visibility,
+      description,
+      createdBy: currentUser.id,
     };
     
     setConversations([...conversations, newGroup]);
@@ -125,7 +186,7 @@ const Index = () => {
     
     toast({
       title: "Groupe créé",
-      description: `Le groupe "${name}" a été créé avec ${participants.length} participant(s).`,
+      description: `Le groupe "${name}" a été créé avec ${participants.length + 1} participant(s).`,
     });
   };
   
@@ -196,6 +257,7 @@ const Index = () => {
           isConnected={isConnected}
           onSendMessage={handleSendMessage}
           onToggleSidebar={toggleSidebar}
+          onPinMessage={handlePinMessage}
         />
         
         <div className="hidden">

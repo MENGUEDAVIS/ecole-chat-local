@@ -14,9 +14,11 @@ interface ChatAreaProps {
   onSendMessage: (
     conversationId: string,
     content: string,
-    attachments?: File[]
+    attachments?: File[],
+    type?: "text" | "voice" | "emoji"
   ) => void;
   onToggleSidebar: () => void;
+  onPinMessage?: (conversationId: string, messageId: string) => void;
 }
 
 const ChatArea: React.FC<ChatAreaProps> = ({
@@ -26,9 +28,11 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   isConnected,
   onSendMessage,
   onToggleSidebar,
+  onPinMessage,
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const [chatbotTyping, setChatbotTyping] = useState(false);
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -42,13 +46,50 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     return users.find((user) => user.id === senderId);
   };
 
-  const handleSendMessage = (content: string, attachments?: File[]) => {
+  const handleSendMessage = (content: string, attachments?: File[], type: "text" | "voice" | "emoji" = "text") => {
     if (conversation) {
-      onSendMessage(conversation.id, content, attachments);
+      onSendMessage(conversation.id, content, attachments, type);
+      
+      // Simulation de réponse du chatbot si activé
+      if (conversation.chatbotEnabled && type === "text" && isConnected) {
+        simulateChatbotResponse();
+      }
     }
   };
   
-  const handleInitiateCall = () => {
+  const simulateChatbotResponse = () => {
+    // Simule un chatbot qui écrit
+    setChatbotTyping(true);
+    
+    setTimeout(() => {
+      setChatbotTyping(false);
+      
+      if (conversation) {
+        const chatbotResponses = [
+          "Bonjour! Je suis le chatbot assistant du cours. Comment puis-je vous aider?",
+          "Vous pouvez consulter le syllabus du cours dans les fichiers partagés.",
+          "La prochaine session aura lieu mardi à 14h en salle B305.",
+          "N'oubliez pas de rendre votre devoir avant vendredi 18h.",
+          "Pour plus d'informations, consultez la page du cours sur le portail étudiant."
+        ];
+        
+        const randomResponse = chatbotResponses[Math.floor(Math.random() * chatbotResponses.length)];
+        
+        const botUser = users.find(u => u.role === "staff" && u.name.includes("Bot"));
+        
+        if (botUser) {
+          onSendMessage(
+            conversation.id, 
+            randomResponse,
+            undefined,
+            "text"
+          );
+        }
+      }
+    }, 2000);
+  };
+  
+  const handleInitiateCall = (isVideo: boolean = false) => {
     if (!isConnected) {
       toast({
         title: "Impossible de démarrer un appel",
@@ -59,7 +100,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     }
     
     toast({
-      title: "Appel en cours",
+      title: isVideo ? "Appel vidéo en cours" : "Appel audio en cours",
       description: `Appel vers ${conversation?.name} en préparation...`,
     });
   };
@@ -99,9 +140,24 @@ const ChatArea: React.FC<ChatAreaProps> = ({
               message={message}
               isCurrentUser={message.senderId === currentUser.id}
               sender={getSender(message.senderId)}
+              onPinMessage={isConnected ? 
+                () => onPinMessage && onPinMessage(conversation.id, message.id) : 
+                undefined
+              }
             />
           ))
         )}
+        
+        {chatbotTyping && (
+          <div className="flex justify-start mb-4">
+            <div className="bg-gray-100 text-ecole-meta p-3 rounded-lg animate-pulse flex items-center">
+              <span className="mr-2">•</span>
+              <span className="mr-2">•</span>
+              <span>•</span>
+            </div>
+          </div>
+        )}
+        
         <div ref={messagesEndRef} />
       </div>
       

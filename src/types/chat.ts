@@ -15,25 +15,34 @@ export interface Message {
   timestamp: string;
   status: "sent" | "pending" | "failed";
   attachments?: Attachment[];
+  type?: "text" | "voice" | "emoji";
+  isPinned?: boolean;
 }
 
 export interface Attachment {
   id: string;
   name: string;
-  type: "image" | "document" | "other";
+  type: "image" | "document" | "voice" | "other";
   url: string;
   size?: string;
+  duration?: number; // Pour les messages vocaux (en secondes)
 }
 
 export interface Conversation {
   id: string;
-  type: "private" | "group";
+  type: "private" | "group" | "channel";
   name: string;
   participants: User[];
   messages: Message[];
   unreadCount?: number;
   lastMessage?: Message;
   avatar?: string;
+  pinnedMessages?: Message[];
+  category?: "project" | "club" | "class" | "course" | "admin" | "other";
+  visibility?: "private" | "public" | "moderated";
+  createdBy?: string; // ID de l'utilisateur créateur
+  description?: string;
+  chatbotEnabled?: boolean;
 }
 
 export interface UserState {
@@ -50,4 +59,13 @@ export interface Call {
   participants: User[];
   status: "ongoing" | "ended" | "missed";
   initiatedBy: string;
+  isVideo?: boolean;
+}
+
+// Interface pour les filtres et la recherche
+export interface ConversationFilters {
+  type?: "private" | "group" | "channel";
+  category?: "project" | "club" | "class" | "course" | "admin" | "other";
+  visibility?: "private" | "public" | "moderated";
+  search?: string;
 }
