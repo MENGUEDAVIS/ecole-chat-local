@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import ThemeToggle from "@/components/chat/ThemeToggle";
 import Sidebar from "@/components/chat/Sidebar";
@@ -7,6 +8,7 @@ import { mockUsers, mockConversations, currentUser, userState } from "@/data/moc
 import { Conversation, Message, User } from "@/types/chat";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "react-router-dom";
 
 const Index = () => {
   const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
@@ -16,6 +18,27 @@ const Index = () => {
   const [isActionSidebarOpen, setIsActionSidebarOpen] = useState<boolean>(false);
   const isMobile = useIsMobile();
   const { toast } = useToast();
+  const location = useLocation();
+
+  // Check URL for contact parameter
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const contactId = params.get('contact');
+    
+    if (contactId) {
+      const existingConversation = conversations.find(
+        (conv) => 
+          conv.type === "private" && 
+          conv.participants.some((p) => p.id === contactId)
+      );
+      
+      if (existingConversation) {
+        setSelectedConversationId(existingConversation.id);
+      } else {
+        handleStartConversation(contactId);
+      }
+    }
+  }, [location.search]);
 
   useEffect(() => {
     // Simulate connection status changes

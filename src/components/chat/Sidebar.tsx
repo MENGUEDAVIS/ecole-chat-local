@@ -1,10 +1,12 @@
+
 import React, { useState } from "react";
-import { Search, Menu, ChevronLeft, Phone, Video } from "lucide-react";
+import { Search, Menu, ChevronLeft, Phone, Video, UserRound } from "lucide-react";
 import Avatar from "./Avatar";
 import { User, Conversation } from "@/types/chat";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 interface SidebarProps {
   users: User[];
@@ -106,6 +108,18 @@ const Sidebar: React.FC<SidebarProps> = ({
             </Button>
           )}
           <h1 className="text-xl font-bold">École Chat</h1>
+        </div>
+        
+        <div className="flex items-center">
+          <Link to="/directory">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white hover:bg-ecole-primary/80 dark:hover:bg-gray-600"
+            >
+              <UserRound className="h-5 w-5" />
+            </Button>
+          </Link>
         </div>
       </div>
 

@@ -1,6 +1,6 @@
 
 import React from "react";
-import { MessageSquarePlus, Users, X } from "lucide-react";
+import { MessageSquarePlus, Users, X, UserRound, Menu } from "lucide-react";
 import { User } from "@/types/chat";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import CreateDirectMessageModal from "./CreateDirectMessageModal";
 import CreateGroupModal from "./CreateGroupModal";
 import Avatar from "./Avatar";
+import { Link } from "react-router-dom";
 
 interface ActionsSidebarProps {
   isOpen: boolean;
@@ -46,18 +47,16 @@ const ActionsSidebar: React.FC<ActionsSidebarProps> = ({
       ${isOpen ? "translate-x-0" : "-translate-x-full"}
       ${isMobile ? "shadow-lg" : ""}
     `}>
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Actions</h2>
-        {isMobile && (
-          <Button variant="ghost" size="icon" onClick={onToggle}>
-            <X className="h-5 w-5" />
-          </Button>
-        )}
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-ecole-primary dark:bg-gray-700 text-white">
+        <h2 className="text-lg font-semibold">Actions</h2>
+        <Button variant="ghost" size="icon" onClick={onToggle} className="text-white hover:bg-ecole-primary/80 dark:hover:bg-gray-600">
+          <X className="h-5 w-5" />
+        </Button>
       </div>
       
-      <div className="flex flex-col p-4 space-y-4">
+      <div className="flex flex-col p-4 space-y-6">
         <div className="space-y-2">
-          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Conversation</h3>
+          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Messages</h3>
           <Dialog>
             <DialogTrigger asChild>
               <Button className="w-full justify-start" variant="outline">
@@ -98,6 +97,16 @@ const ActionsSidebar: React.FC<ActionsSidebarProps> = ({
               />
             </DialogContent>
           </Dialog>
+        </div>
+        
+        <div className="space-y-2">
+          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Contacts</h3>
+          <Button className="w-full justify-start" variant="outline" asChild>
+            <Link to="/directory">
+              <UserRound className="h-5 w-5 mr-2" />
+              Annuaire des contacts
+            </Link>
+          </Button>
         </div>
       </div>
       
