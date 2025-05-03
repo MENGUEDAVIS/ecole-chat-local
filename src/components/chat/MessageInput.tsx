@@ -1,6 +1,5 @@
-
 import React, { useState, FormEvent, useRef } from "react";
-import { Paperclip, Mic, MicOff, Send, Smile } from "lucide-react";
+import { Paperclip, Mic, MicOff, Send, Smile, X } from "lucide-react";
 
 interface MessageInputProps {
   onSendMessage: (content: string, attachments?: File[], type?: "text" | "voice" | "emoji") => void;
