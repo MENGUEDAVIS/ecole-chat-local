@@ -41,3 +41,13 @@ export interface UserState {
   isConnected: boolean;
   lastSyncTime?: string;
 }
+
+export interface Call {
+  id: string;
+  conversationId: string;
+  startTime: string;
+  endTime?: string;
+  participants: User[];
+  status: "ongoing" | "ended" | "missed";
+  initiatedBy: string;
+}

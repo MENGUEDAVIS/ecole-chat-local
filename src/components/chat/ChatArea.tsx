@@ -4,6 +4,7 @@ import ChatHeader from "./ChatHeader";
 import MessageBubble from "./MessageBubble";
 import MessageInput from "./MessageInput";
 import { Conversation, Message, User, Attachment } from "@/types/chat";
+import { useToast } from "@/hooks/use-toast";
 
 interface ChatAreaProps {
   conversation: Conversation | null;
@@ -27,6 +28,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   onToggleSidebar,
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -44,6 +46,22 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     if (conversation) {
       onSendMessage(conversation.id, content, attachments);
     }
+  };
+  
+  const handleInitiateCall = () => {
+    if (!isConnected) {
+      toast({
+        title: "Impossible de démarrer un appel",
+        description: "Vous êtes hors ligne. Reconnectez-vous au réseau pour passer un appel.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    toast({
+      title: "Appel en cours",
+      description: `Appel vers ${conversation?.name} en préparation...`,
+    });
   };
 
   if (!conversation) {
@@ -63,6 +81,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         conversation={conversation} 
         isConnected={isConnected} 
         onToggleSidebar={onToggleSidebar}
+        onInitiateCall={handleInitiateCall}
       />
       
       <div className="flex-1 overflow-y-auto p-4 bg-gray-50 messages-container">

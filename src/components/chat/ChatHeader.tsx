@@ -1,17 +1,24 @@
 
 import React from "react";
-import { ArrowLeft, CloudOff, Search, Upload } from "lucide-react";
+import { ArrowLeft, CloudOff, Search, Upload, PhoneCall, Users } from "lucide-react";
 import Avatar from "./Avatar";
 import { Conversation } from "@/types/chat";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@/components/ui/button";
 
 interface ChatHeaderProps {
   conversation: Conversation;
   isConnected: boolean;
   onToggleSidebar: () => void;
+  onInitiateCall?: () => void;
 }
 
-const ChatHeader: React.FC<ChatHeaderProps> = ({ conversation, isConnected, onToggleSidebar }) => {
+const ChatHeader: React.FC<ChatHeaderProps> = ({ 
+  conversation, 
+  isConnected, 
+  onToggleSidebar,
+  onInitiateCall 
+}) => {
   const isMobile = useIsMobile();
 
   const getParticipantString = () => {
@@ -53,7 +60,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ conversation, isConnected, onTo
         </div>
       </div>
 
-      <div className="flex items-center">
+      <div className="flex items-center gap-1">
         {!isConnected && (
           <div className="mr-3 flex items-center text-xs text-ecole-offline animate-pulse-subtle">
             <CloudOff size={16} className="mr-1" />
@@ -61,13 +68,34 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ conversation, isConnected, onTo
           </div>
         )}
         
-        <button className="p-2 text-ecole-meta hover:bg-gray-100 rounded-full focus:outline-none">
-          <Search size={18} />
-        </button>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="text-ecole-meta hover:bg-gray-100 hover:text-ecole-primary"
+          onClick={onInitiateCall}
+          disabled={!isConnected}
+          title="Appel"
+        >
+          <PhoneCall size={18} />
+        </Button>
         
-        <button className="p-2 text-ecole-meta hover:bg-gray-100 rounded-full focus:outline-none">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="text-ecole-meta hover:bg-gray-100 hover:text-ecole-primary"
+          title="Rechercher"
+        >
+          <Search size={18} />
+        </Button>
+        
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="text-ecole-meta hover:bg-gray-100 hover:text-ecole-primary"
+          title="Partager un fichier"
+        >
           <Upload size={18} />
-        </button>
+        </Button>
       </div>
     </div>
   );

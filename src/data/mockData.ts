@@ -1,4 +1,4 @@
-import { User, Conversation, Message, Attachment, UserState } from "../types/chat";
+import { User, Conversation, Message, Attachment, UserState, Call } from "../types/chat";
 
 // Mock Users
 export const mockUsers: User[] = [
@@ -176,6 +176,27 @@ export const mockConversations: Conversation[] = [
     unreadCount: 2,
     avatar: mockUsers.find((u) => u.id === "u2")?.avatar,
   },
+];
+
+// Mock Calls
+export const mockCalls: Call[] = [
+  {
+    id: "call1",
+    conversationId: "c4",
+    startTime: "2023-05-03T10:00:00",
+    endTime: "2023-05-03T10:05:30",
+    participants: [mockUsers.find((u) => u.id === "u1") as User, currentUser],
+    status: "ended",
+    initiatedBy: "u0",
+  },
+  {
+    id: "call2",
+    conversationId: "c5",
+    startTime: "2023-05-03T11:15:00",
+    participants: [mockUsers.find((u) => u.id === "u2") as User, currentUser],
+    status: "missed",
+    initiatedBy: "u2",
+  }
 ];
 
 // User State

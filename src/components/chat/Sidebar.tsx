@@ -1,10 +1,13 @@
 
 import React, { useState } from "react";
-import { Search, Plus, CloudOff, Clock, ArrowLeft } from "lucide-react";
+import { Search, Plus, CloudOff, Clock, ArrowLeft, MessageSquare, Users } from "lucide-react";
 import Avatar from "./Avatar";
 import { User, Conversation } from "@/types/chat";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@/components/ui/button";
+import CreateGroupModal from "./CreateGroupModal";
+import CreateDirectMessageModal from "./CreateDirectMessageModal";
 
 interface SidebarProps {
   users: User[];
@@ -63,6 +66,16 @@ const Sidebar: React.FC<SidebarProps> = ({
     } else {
       return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
     }
+  };
+  
+  const handleCreateGroup = (name: string, participants: User[]) => {
+    // Cette fonction sera implémentée au niveau du parent
+    console.log("Create group:", name, participants);
+  };
+  
+  const handleStartConversation = (userId: string) => {
+    // Cette fonction sera implémentée au niveau du parent
+    console.log("Start conversation with:", userId);
   };
 
   if (isMobile && !isSidebarOpen) return null;
@@ -274,12 +287,19 @@ const Sidebar: React.FC<SidebarProps> = ({
               </div>
             )}
             
-            {/* New Chat Button */}
-            <div className="px-4 py-3">
-              <button className="w-full bg-ecole-accent text-ecole-text font-medium py-2 rounded-md flex items-center justify-center hover:bg-ecole-accent/90 focus:outline-none focus:ring-2 focus:ring-ecole-accent transition-colors">
-                <Plus size={18} className="mr-2" />
-                Nouvelle conversation
-              </button>
+            {/* Action Buttons */}
+            <div className="px-4 py-3 space-y-2">
+              <CreateDirectMessageModal
+                users={users}
+                currentUser={currentUser}
+                onStartConversation={handleStartConversation}
+              />
+              
+              <CreateGroupModal
+                users={users}
+                currentUser={currentUser}
+                onCreateGroup={handleCreateGroup}
+              />
             </div>
           </div>
         ) : (
