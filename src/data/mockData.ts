@@ -1,5 +1,4 @@
-
-import { User, Conversation, Message, Attachment } from "../types/chat";
+import { User, Conversation, Message, Attachment, UserState } from "../types/chat";
 
 // Mock Users
 export const mockUsers: User[] = [
