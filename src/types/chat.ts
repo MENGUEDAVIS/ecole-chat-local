@@ -43,6 +43,7 @@ export interface Conversation {
   createdBy?: string; // ID de l'utilisateur créateur
   description?: string;
   chatbotEnabled?: boolean;
+  isPinned?: boolean; // Add this property to the interface
 }
 
 export interface UserState {

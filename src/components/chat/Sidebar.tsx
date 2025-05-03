@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Search, Menu, ChevronLeft, Phone, Video } from "lucide-react";
 import Avatar from "./Avatar";
@@ -180,7 +179,8 @@ const Sidebar: React.FC<SidebarProps> = ({
         {filteredConversations.map((conversation) => {
           const lastMessage = conversation.messages[conversation.messages.length - 1];
           const isGroup = conversation.type === "group";
-          const isPinned = conversation.isPinned;
+          // Fix: Check if the conversation has the isPinned property before accessing it
+          const isPinned = 'isPinned' in conversation ? conversation.isPinned : false;
           
           return (
             <div

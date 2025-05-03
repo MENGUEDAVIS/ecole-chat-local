@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import ThemeToggle from "@/components/chat/ThemeToggle";
 import Sidebar from "@/components/chat/Sidebar";
@@ -255,7 +254,7 @@ const Index = () => {
     <div className="h-screen flex overflow-hidden bg-gray-50 dark:bg-gray-900">
       <ActionsSidebar 
         isOpen={isActionSidebarOpen}
-        onToggle={toggleActionSidebarOpen}
+        onToggle={toggleActionSidebar}
         users={mockUsers}
         currentUser={currentUser}
         onStartConversation={handleStartConversation}
