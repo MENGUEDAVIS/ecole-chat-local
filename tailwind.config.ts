@@ -74,6 +74,9 @@ export default {
 					otherMessage: '#FFF8E1', // Blanc cassé
 					offline: '#EF5350', // Rouge discret
 				},
+                gray: {
+                    750: '#2D3748', // Extra dark gray for dark mode
+                },
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -111,7 +114,10 @@ export default {
 			},
 			fontFamily: {
 				'roboto': ['Roboto', 'sans-serif']
-			}
+			},
+            screens: {
+                'xs': '475px',
+            },
 		}
 	},
 	plugins: [require("tailwindcss-animate")],

@@ -3,18 +3,18 @@ import React, { useState, useEffect } from "react";
 import ThemeToggle from "@/components/chat/ThemeToggle";
 import Sidebar from "@/components/chat/Sidebar";
 import ChatArea from "@/components/chat/ChatArea";
+import ActionsSidebar from "@/components/chat/ActionsSidebar";
 import { mockUsers, mockConversations, currentUser, userState } from "@/data/mockData";
 import { Conversation, Message, User } from "@/types/chat";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
-import CreateGroupModal from "@/components/chat/CreateGroupModal";
-import CreateDirectMessageModal from "@/components/chat/CreateDirectMessageModal";
 
 const Index = () => {
   const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(userState.isConnected);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+  const [isActionSidebarOpen, setIsActionSidebarOpen] = useState<boolean>(false);
   const isMobile = useIsMobile();
   const { toast } = useToast();
 
@@ -54,6 +54,11 @@ const Index = () => {
         conv.id === id ? { ...conv, unreadCount: 0 } : conv
       )
     );
+    
+    // Close sidebar on mobile when selecting a conversation
+    if (isMobile) {
+      setIsSidebarOpen(false);
+    }
   };
 
   // Handle sending a message
@@ -234,10 +239,29 @@ const Index = () => {
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
+    if (isMobile && isActionSidebarOpen) {
+      setIsActionSidebarOpen(false);
+    }
+  };
+  
+  const toggleActionSidebar = () => {
+    setIsActionSidebarOpen(!isActionSidebarOpen);
+    if (isMobile && isSidebarOpen) {
+      setIsSidebarOpen(false);
+    }
   };
 
   return (
-    <div className="h-screen flex overflow-hidden bg-gray-50">
+    <div className="h-screen flex overflow-hidden bg-gray-50 dark:bg-gray-900">
+      <ActionsSidebar 
+        isOpen={isActionSidebarOpen}
+        onToggle={toggleActionSidebarOpen}
+        users={mockUsers}
+        currentUser={currentUser}
+        onStartConversation={handleStartConversation}
+        onCreateGroup={handleCreateGroup}
+      />
+      
       <Sidebar
         users={mockUsers}
         conversations={conversations}
@@ -247,9 +271,10 @@ const Index = () => {
         selectedConversationId={selectedConversationId}
         isSidebarOpen={isSidebarOpen}
         onToggleSidebar={toggleSidebar}
+        onToggleActionSidebar={toggleActionSidebar}
       />
       
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-1 h-full">
         <ChatArea
           conversation={selectedConversation}
           currentUser={currentUser}
@@ -259,19 +284,6 @@ const Index = () => {
           onToggleSidebar={toggleSidebar}
           onPinMessage={handlePinMessage}
         />
-        
-        <div className="hidden">
-          <CreateGroupModal 
-            users={mockUsers}
-            currentUser={currentUser}
-            onCreateGroup={handleCreateGroup}
-          />
-          <CreateDirectMessageModal
-            users={mockUsers}
-            currentUser={currentUser}
-            onStartConversation={handleStartConversation}
-          />
-        </div>
       </div>
       
       <ThemeToggle />

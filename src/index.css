@@ -93,7 +93,11 @@
   }
 
   body {
-    @apply bg-background text-foreground font-roboto;
+    @apply bg-background text-foreground font-roboto overflow-hidden;
+  }
+  
+  .dark body {
+    @apply bg-gray-900 text-gray-100;
   }
 }
 
@@ -103,12 +107,11 @@
 }
 
 .messages-container::-webkit-scrollbar-track {
-  background: transparent;
+  @apply bg-transparent;
 }
 
 .messages-container::-webkit-scrollbar-thumb {
-  background-color: #c1c1c1;
-  border-radius: 20px;
+  @apply bg-gray-300 dark:bg-gray-600 rounded-full;
 }
 
 /* Message animations */
@@ -130,4 +133,49 @@
   height: 6px;
   border-radius: 50%;
   background-color: #EF5350;
+}
+
+/* WhatsApp-like styling for bubbles */
+.message-bubble-user {
+  @apply bg-ecole-userMessage dark:bg-blue-800 text-gray-800 dark:text-white;
+  border-radius: 15px 0 15px 15px;
+}
+
+.message-bubble-other {
+  @apply bg-white dark:bg-gray-700 text-gray-800 dark:text-white;
+  border-radius: 0 15px 15px 15px;
+}
+
+/* User status indicators */
+.status-indicator {
+  @apply w-3 h-3 rounded-full absolute right-0 bottom-0 border-2 border-white dark:border-gray-800;
+}
+
+.status-online {
+  @apply bg-green-500;
+}
+
+.status-offline {
+  @apply bg-gray-400 dark:bg-gray-500;
+}
+
+/* Fade-in animation for elements */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Mobile responsive styling */
+@media (max-width: 640px) {
+  .message-input-container {
+    @apply pb-4;
+  }
+  
+  .message-bubble-container {
+    @apply max-w-[80%];
+  }
 }
