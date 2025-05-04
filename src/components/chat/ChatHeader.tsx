@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { 
   ArrowLeft, 
@@ -175,8 +176,8 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
               <TooltipContent>
                 <p>Appel audio</p>
               </TooltipContent>
-            </TooltipProvider>
-          )}
+            </Tooltip>
+          </TooltipProvider>
           
           <TooltipProvider>
             <Tooltip>
@@ -194,7 +195,8 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
               <TooltipContent>
                 <p>Appel vidéo</p>
               </TooltipContent>
-            </TooltipProvider>
+            </Tooltip>
+          </TooltipProvider>
 
           <Button 
             variant="ghost" 
@@ -228,7 +230,8 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
               <TooltipContent>
                 <p>Informations</p>
               </TooltipContent>
-            </TooltipProvider>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
       
