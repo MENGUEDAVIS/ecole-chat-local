@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from "react";
 import ThemeToggle from "@/components/chat/ThemeToggle";
 import Sidebar from "@/components/chat/Sidebar";
@@ -10,7 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { chatService, ConversationWithParticipants, MessageWithSender } from "@/services/ChatService";
 import { toast } from "@/components/ui/sonner";
 import { Profile } from "@/types/supabase";
-import { User } from "@/types/chat";
+import { User, Conversation } from "@/types/chat";
 import { supabase } from "@/integrations/supabase/client";
 import CallDialog from "@/components/chat/CallDialog";
 import CallScreen from "@/components/chat/CallScreen";
@@ -510,6 +511,34 @@ const Index = () => {
     return profiles.map(profileToUser);
   };
 
+  // Convert ConversationWithParticipants to Conversation
+  const conversationToBase = (conversation: ConversationWithParticipants): Conversation => {
+    return {
+      id: conversation.id,
+      type: conversation.type,
+      name: conversation.name || "",
+      participants: profilesToUsers(conversation.participants),
+      messages: [],
+      category: conversation.category,
+      visibility: conversation.visibility,
+      description: conversation.description,
+      avatar: conversation.avatar_url,
+      chatbotEnabled: conversation.chatbot_enabled,
+      isPinned: conversation.is_pinned,
+      createdBy: conversation.created_by,
+      created_at: conversation.created_at,
+      updated_at: conversation.updated_at,
+      avatar_url: conversation.avatar_url,
+      is_pinned: conversation.is_pinned,
+      chatbot_enabled: conversation.chatbot_enabled
+    };
+  };
+
+  // Convert ConversationWithParticipants[] to Conversation[]
+  const conversationsToBase = (conversations: ConversationWithParticipants[]): Conversation[] => {
+    return conversations.map(conversationToBase);
+  };
+
   return (
     <div className="h-screen flex overflow-hidden bg-gray-50 dark:bg-gray-900">
       <ActionsSidebar 
@@ -533,7 +562,7 @@ const Index = () => {
       
       <Sidebar
         users={profilesToUsers(users)}
-        conversations={conversations}
+        conversations={conversationsToBase(conversations)}
         currentUser={profile ? profileToUser(profile) : null}
         isConnected={isConnected}
         onSelectConversation={handleSelectConversation}
@@ -545,7 +574,7 @@ const Index = () => {
       
       <div className="flex flex-col flex-1 h-full">
         <ChatArea
-          conversation={selectedConversation}
+          conversation={selectedConversation ? conversationToBase(selectedConversation) : null}
           currentUser={profile}
           users={users}
           isConnected={isConnected}

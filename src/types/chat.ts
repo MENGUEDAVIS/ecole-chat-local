@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   name: string;
@@ -21,7 +22,11 @@ export interface Message {
   status: "sent" | "pending" | "failed";
   attachments?: Attachment[];
   type?: "text" | "voice" | "emoji";
-  isPinned?: boolean;
+  is_pinned?: boolean; // Changed from isPinned to is_pinned for consistency
+  // Additional properties for compatibility with MessageWithSender
+  sender_id?: string | null;
+  sender?: any;
+  conversation_id?: string;
 }
 
 export interface Attachment {
