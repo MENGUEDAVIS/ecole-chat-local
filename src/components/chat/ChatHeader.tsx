@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { 
   ArrowLeft, 
@@ -82,7 +81,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   // Convertir les messages épinglés au format MessageWithSender
   const pinnedMessages = conversation.messages 
     ? conversation.messages
-        .filter(msg => msg.isPinned || msg.is_pinned)
+        .filter(msg => msg.is_pinned)
         .map(msg => ({
           ...msg,
           sender_id: msg.senderId || msg.sender_id || null,
@@ -176,8 +175,8 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
               <TooltipContent>
                 <p>Appel audio</p>
               </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+            </TooltipProvider>
+          )}
           
           <TooltipProvider>
             <Tooltip>
@@ -195,8 +194,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
               <TooltipContent>
                 <p>Appel vidéo</p>
               </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+            </TooltipProvider>
 
           <Button 
             variant="ghost" 
@@ -230,8 +228,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
               <TooltipContent>
                 <p>Informations</p>
               </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+            </TooltipProvider>
         </div>
       </div>
       

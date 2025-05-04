@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from "@/integrations/supabase/client";
@@ -87,13 +88,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Assurer que le rôle est correctement typé
+      // Ensure that the role and status are correctly typed
       if (data) {
         const typedProfile: Profile = {
           ...data,
           role: data.role as 'student' | 'teacher' | 'staff',
           status: data.status as 'online' | 'offline',
-          // Ajouter la propriété 'name' pour compatibilité
+          // Add the 'name' property for compatibility
           name: data.full_name || data.username || data.id
         };
         setProfile(typedProfile);

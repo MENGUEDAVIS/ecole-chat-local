@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { chatService, ConversationWithParticipants, MessageWithSender } from "@/services/ChatService";
 import { toast } from "@/components/ui/sonner";
 import { Profile } from "@/types/supabase";
+import { User } from "@/types/chat";
 import { supabase } from "@/integrations/supabase/client";
 import CallDialog from "@/components/chat/CallDialog";
 import CallScreen from "@/components/chat/CallScreen";
@@ -488,21 +489,52 @@ const Index = () => {
     }
   };
 
+  // Convert Profile to User for components that expect User type
+  const profileToUser = (profile: Profile): User => ({
+    id: profile.id,
+    name: profile.name || profile.full_name || profile.username || profile.id,
+    avatar: profile.avatar_url || undefined,
+    status: profile.status as "online" | "offline",
+    role: profile.role,
+    lastSeen: profile.last_seen,
+    // Add Profile properties
+    username: profile.username || undefined,
+    avatar_url: profile.avatar_url || undefined,
+    full_name: profile.full_name || undefined,
+    created_at: profile.created_at,
+    updated_at: profile.updated_at
+  });
+
+  // Convert Profile[] to User[]
+  const profilesToUsers = (profiles: Profile[]): User[] => {
+    return profiles.map(profileToUser);
+  };
+
   return (
     <div className="h-screen flex overflow-hidden bg-gray-50 dark:bg-gray-900">
       <ActionsSidebar 
         isOpen={isActionSidebarOpen}
         onToggle={toggleActionSidebar}
-        users={users}
-        currentUser={profile}
-        onStartConversation={handleStartConversation}
-        onCreateGroup={handleCreateGroup}
+        users={profilesToUsers(users)}
+        currentUser={profile ? profileToUser(profile) : null}
+        onStartConversation={(user) => {
+          // Convert User back to Profile for internal handlers
+          const profileUser = users.find(p => p.id === user.id);
+          if (profileUser) handleStartConversation(profileUser);
+        }}
+        onCreateGroup={(name, participantsUsers, category, visibility, description) => {
+          // Convert User[] back to Profile[]
+          const participantProfiles = participantsUsers.map(u => 
+            users.find(p => p.id === u.id)
+          ).filter(Boolean) as Profile[];
+          handleCreateGroup(name, participantProfiles, category, visibility, description);
+        }}
       />
       
       <Sidebar
-        users={users}
+        users={profilesToUsers(users)}
         conversations={conversations}
-        currentUser={profile}
+        currentUser={profile ? profileToUser(profile) : null}
         isConnected={isConnected}
         onSelectConversation={handleSelectConversation}
         selectedConversationId={selectedConversationId}

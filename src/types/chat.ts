@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -6,6 +5,12 @@ export interface User {
   status: "online" | "offline";
   role: "student" | "teacher" | "staff";
   lastSeen?: string;
+  // Add Profile properties to make User and Profile more compatible
+  username?: string; 
+  avatar_url?: string;
+  full_name?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Message {
@@ -41,9 +46,16 @@ export interface Conversation {
   category?: "project" | "club" | "class" | "course" | "admin" | "other";
   visibility?: "private" | "public" | "moderated";
   createdBy?: string; // ID de l'utilisateur créateur
+  created_by?: string; // Added for compatibility
   description?: string;
   chatbotEnabled?: boolean;
-  isPinned?: boolean; // Add this property to the interface
+  isPinned?: boolean;
+  // Add for compatibility with ConversationWithParticipants
+  created_at?: string;
+  updated_at?: string;
+  avatar_url?: string;
+  is_pinned?: boolean;
+  chatbot_enabled?: boolean;
 }
 
 export interface UserState {
