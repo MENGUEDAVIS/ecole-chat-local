@@ -1,15 +1,16 @@
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import ChatHeader from "./ChatHeader";
 import MessageBubble from "./MessageBubble";
 import MessageInput from "./MessageInput";
-import { Conversation, Message, User, Attachment } from "@/types/chat";
-import { useToast } from "@/hooks/use-toast";
+import { ConversationWithParticipants, MessageWithSender } from "@/services/ChatService";
+import { Profile } from "@/types/supabase";
+import { Loader2 } from "lucide-react";
 
 interface ChatAreaProps {
-  conversation: Conversation | null;
-  currentUser: User;
-  users: User[];
+  conversation: ConversationWithParticipants | null;
+  currentUser: Profile | null;
+  users: Profile[];
   isConnected: boolean;
   onSendMessage: (
     conversationId: string,
@@ -19,6 +20,9 @@ interface ChatAreaProps {
   ) => void;
   onToggleSidebar: () => void;
   onPinMessage?: (conversationId: string, messageId: string) => void;
+  onInitiateCall?: (isVideo?: boolean) => void;
+  isLoadingMessages: boolean;
+  messages: MessageWithSender[];
 }
 
 const ChatArea: React.FC<ChatAreaProps> = ({
@@ -29,80 +33,21 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   onSendMessage,
   onToggleSidebar,
   onPinMessage,
+  onInitiateCall,
+  isLoadingMessages,
+  messages
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
-  const [chatbotTyping, setChatbotTyping] = useState(false);
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [conversation?.messages]);
-
-  const getSender = (senderId: string): User | undefined => {
-    if (senderId === currentUser.id) {
-      return currentUser;
-    }
-    return users.find((user) => user.id === senderId);
-  };
+  }, [messages]);
 
   const handleSendMessage = (content: string, attachments?: File[], type: "text" | "voice" | "emoji" = "text") => {
     if (conversation) {
       onSendMessage(conversation.id, content, attachments, type);
-      
-      // Simulation de réponse du chatbot si activé
-      if (conversation.chatbotEnabled && type === "text" && isConnected) {
-        simulateChatbotResponse();
-      }
     }
-  };
-  
-  const simulateChatbotResponse = () => {
-    // Simule un chatbot qui écrit
-    setChatbotTyping(true);
-    
-    setTimeout(() => {
-      setChatbotTyping(false);
-      
-      if (conversation) {
-        const chatbotResponses = [
-          "Bonjour! Je suis le chatbot assistant du cours. Comment puis-je vous aider?",
-          "Vous pouvez consulter le syllabus du cours dans les fichiers partagés.",
-          "La prochaine session aura lieu mardi à 14h en salle B305.",
-          "N'oubliez pas de rendre votre devoir avant vendredi 18h.",
-          "Pour plus d'informations, consultez la page du cours sur le portail étudiant."
-        ];
-        
-        const randomResponse = chatbotResponses[Math.floor(Math.random() * chatbotResponses.length)];
-        
-        const botUser = users.find(u => u.role === "staff" && u.name.includes("Bot"));
-        
-        if (botUser) {
-          onSendMessage(
-            conversation.id, 
-            randomResponse,
-            undefined,
-            "text"
-          );
-        }
-      }
-    }, 2000);
-  };
-  
-  const handleInitiateCall = (isVideo: boolean = false) => {
-    if (!isConnected) {
-      toast({
-        title: "Impossible de démarrer un appel",
-        description: "Vous êtes hors ligne. Reconnectez-vous au réseau pour passer un appel.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    toast({
-      title: isVideo ? "Appel vidéo en cours" : "Appel audio en cours",
-      description: `Appel vers ${conversation?.name} en préparation...`,
-    });
   };
 
   if (!conversation) {
@@ -142,11 +87,18 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         conversation={conversation} 
         isConnected={isConnected} 
         onToggleSidebar={onToggleSidebar}
-        onInitiateCall={handleInitiateCall}
+        onInitiateCall={onInitiateCall}
       />
       
       <div className="flex-1 overflow-y-auto p-4 bg-gray-50 dark:bg-gray-900 messages-container">
-        {conversation.messages.length === 0 ? (
+        {isLoadingMessages ? (
+          <div className="flex-1 flex items-center justify-center h-full">
+            <div className="text-center text-gray-500 dark:text-gray-400">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
+              <p>Chargement des messages...</p>
+            </div>
+          </div>
+        ) : messages.length === 0 ? (
           <div className="flex-1 flex items-center justify-center h-full">
             <div className="text-center text-gray-500 dark:text-gray-400">
               <p>Aucun message</p>
@@ -154,28 +106,18 @@ const ChatArea: React.FC<ChatAreaProps> = ({
             </div>
           </div>
         ) : (
-          conversation.messages.map((message) => (
+          messages.map((message) => (
             <MessageBubble
               key={message.id}
               message={message}
-              isCurrentUser={message.senderId === currentUser.id}
-              sender={getSender(message.senderId)}
-              onPinMessage={isConnected ? 
-                () => onPinMessage && onPinMessage(conversation.id, message.id) : 
+              isCurrentUser={currentUser ? message.sender_id === currentUser.id : false}
+              sender={message.sender}
+              onPinMessage={isConnected && onPinMessage ? 
+                () => onPinMessage(conversation.id, message.id) : 
                 undefined
               }
             />
           ))
-        )}
-        
-        {chatbotTyping && (
-          <div className="flex justify-start mb-4">
-            <div className="bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 p-3 rounded-lg animate-pulse flex items-center">
-              <span className="mr-2">•</span>
-              <span className="mr-2">•</span>
-              <span>•</span>
-            </div>
-          </div>
         )}
         
         <div ref={messagesEndRef} />

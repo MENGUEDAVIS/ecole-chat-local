@@ -9,7 +9,259 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      attachments: {
+        Row: {
+          duration: number | null
+          id: string
+          message_id: string
+          name: string
+          size: string | null
+          type: string
+          url: string
+        }
+        Insert: {
+          duration?: number | null
+          id?: string
+          message_id: string
+          name: string
+          size?: string | null
+          type: string
+          url: string
+        }
+        Update: {
+          duration?: number | null
+          id?: string
+          message_id?: string
+          name?: string
+          size?: string | null
+          type?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attachments_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      call_participants: {
+        Row: {
+          call_id: string
+          joined_at: string | null
+          left_at: string | null
+          user_id: string
+        }
+        Insert: {
+          call_id: string
+          joined_at?: string | null
+          left_at?: string | null
+          user_id: string
+        }
+        Update: {
+          call_id?: string
+          joined_at?: string | null
+          left_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "call_participants_call_id_fkey"
+            columns: ["call_id"]
+            isOneToOne: false
+            referencedRelation: "calls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      calls: {
+        Row: {
+          conversation_id: string
+          end_time: string | null
+          id: string
+          initiated_by: string | null
+          is_video: boolean | null
+          start_time: string | null
+          status: string | null
+        }
+        Insert: {
+          conversation_id: string
+          end_time?: string | null
+          id?: string
+          initiated_by?: string | null
+          is_video?: boolean | null
+          start_time?: string | null
+          status?: string | null
+        }
+        Update: {
+          conversation_id?: string
+          end_time?: string | null
+          id?: string
+          initiated_by?: string | null
+          is_video?: boolean | null
+          start_time?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calls_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversation_participants: {
+        Row: {
+          conversation_id: string
+          joined_at: string | null
+          user_id: string
+        }
+        Insert: {
+          conversation_id: string
+          joined_at?: string | null
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string
+          joined_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_participants_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversations: {
+        Row: {
+          avatar_url: string | null
+          category: string | null
+          chatbot_enabled: boolean | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_pinned: boolean | null
+          name: string | null
+          type: string
+          updated_at: string | null
+          visibility: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          category?: string | null
+          chatbot_enabled?: boolean | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_pinned?: boolean | null
+          name?: string | null
+          type: string
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          category?: string | null
+          chatbot_enabled?: boolean | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_pinned?: boolean | null
+          name?: string | null
+          type?: string
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          id: string
+          is_pinned: boolean | null
+          sender_id: string | null
+          status: string
+          timestamp: string | null
+          type: string | null
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          id?: string
+          is_pinned?: boolean | null
+          sender_id?: string | null
+          status: string
+          timestamp?: string | null
+          type?: string | null
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          id?: string
+          is_pinned?: boolean | null
+          sender_id?: string | null
+          status?: string
+          timestamp?: string | null
+          type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          full_name: string | null
+          id: string
+          last_seen: string | null
+          role: string
+          status: string | null
+          updated_at: string | null
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id: string
+          last_seen?: string | null
+          role: string
+          status?: string | null
+          updated_at?: string | null
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string
+          last_seen?: string | null
+          role?: string
+          status?: string | null
+          updated_at?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
