@@ -88,7 +88,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      setProfile(data);
+      // Assurer que le rôle est correctement typé
+      if (data) {
+        const typedProfile: Profile = {
+          ...data,
+          role: data.role as 'student' | 'teacher' | 'staff',
+          status: data.status as 'online' | 'offline',
+          // Ajouter la propriété 'name' pour compatibilité
+          name: data.full_name || data.username || data.id
+        };
+        setProfile(typedProfile);
+      }
     } catch (error) {
       console.error('Error fetching user profile:', error);
     }

@@ -1,14 +1,15 @@
 
 import React from "react";
-import { Message, Conversation, User } from "@/types/chat";
+import { MessageWithSender } from "@/services/ChatService";
+import { ConversationWithParticipants } from "@/services/ChatService";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 
 interface PinnedMessagesProps {
-  messages: Message[];
-  conversation: Conversation;
+  messages: MessageWithSender[];
+  conversation: ConversationWithParticipants;
   onClose: () => void;
 }
 
@@ -19,9 +20,10 @@ const PinnedMessages: React.FC<PinnedMessagesProps> = ({
 }) => {
   if (messages.length === 0) return null;
 
-  const getSenderName = (senderId: string): string => {
+  const getSenderName = (senderId: string | null): string => {
+    if (!senderId) return "Utilisateur inconnu";
     const participant = conversation.participants.find(p => p.id === senderId);
-    return participant?.name || "Utilisateur inconnu";
+    return participant?.name || participant?.full_name || participant?.username || "Utilisateur inconnu";
   };
 
   const formatTime = (timestamp: string): string => {
@@ -50,7 +52,7 @@ const PinnedMessages: React.FC<PinnedMessagesProps> = ({
             className="bg-white rounded-lg p-2 text-sm shadow-sm border border-gray-100"
           >
             <div className="flex justify-between text-xs text-ecole-meta mb-1">
-              <span className="font-medium">{getSenderName(message.senderId)}</span>
+              <span className="font-medium">{getSenderName(message.sender_id)}</span>
               <span>{formatTime(message.timestamp)}</span>
             </div>
             <p className="line-clamp-2">{message.content}</p>

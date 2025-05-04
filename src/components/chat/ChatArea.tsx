@@ -109,9 +109,16 @@ const ChatArea: React.FC<ChatAreaProps> = ({
           messages.map((message) => (
             <MessageBubble
               key={message.id}
-              message={message}
+              message={{
+                ...message,
+                // Assurer la compatibilité avec l'interface Message de chat.ts
+                senderId: message.sender_id || '',
+              }}
               isCurrentUser={currentUser ? message.sender_id === currentUser.id : false}
-              sender={message.sender}
+              sender={message.sender ? {
+                ...message.sender,
+                name: message.sender.name || message.sender.full_name || message.sender.username || ''
+              } : null}
               onPinMessage={isConnected && onPinMessage ? 
                 () => onPinMessage(conversation.id, message.id) : 
                 undefined

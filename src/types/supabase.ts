@@ -9,6 +9,8 @@ export type Profile = {
   updated_at: string;
   last_seen: string;
   status: 'online' | 'offline';
+  // Ajout d'une propriété pour compatibilité avec User
+  name?: string;
 };
 
 export type Conversation = {
@@ -24,6 +26,9 @@ export type Conversation = {
   avatar_url?: string | null;
   chatbot_enabled?: boolean;
   is_pinned?: boolean;
+  // Propriété pour compatibilité avec l'interface Conversation de chat.ts
+  messages?: Message[];
+  participants?: Profile[];
 };
 
 export type ConversationParticipant = {
@@ -41,6 +46,10 @@ export type Message = {
   status: 'sent' | 'pending' | 'failed';
   type?: 'text' | 'voice' | 'emoji';
   is_pinned?: boolean;
+  // Propriété pour compatibilité avec l'interface Message de chat.ts
+  senderId?: string;
+  attachments?: Attachment[];
+  sender?: Profile | null;
 };
 
 export type Attachment = {

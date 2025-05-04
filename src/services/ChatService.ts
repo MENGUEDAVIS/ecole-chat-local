@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Conversation, Message, Profile, ConversationParticipant, Attachment } from "@/types/supabase";
 import { toast } from "@/components/ui/sonner";
@@ -57,11 +56,18 @@ class ChatService {
             .in('id', participantIds);
             
           if (profilesError) throw profilesError;
+
+          // Ajouter la propriété 'name' aux profils pour compatibilité avec User
+          const enhancedProfiles = (profiles || []).map(profile => ({
+            ...profile,
+            name: profile.full_name || profile.username || profile.id
+          }));
           
           return {
             ...conversation,
-            participants: profiles || []
-          };
+            type: conversation.type as 'private' | 'group' | 'channel',
+            participants: enhancedProfiles || []
+          } as ConversationWithParticipants;
         })
       );
       
@@ -98,7 +104,10 @@ class ChatService {
         if (!acc[attachment.message_id]) {
           acc[attachment.message_id] = [];
         }
-        acc[attachment.message_id].push(attachment);
+        acc[attachment.message_id].push({
+          ...attachment,
+          type: attachment.type as 'image' | 'document' | 'voice' | 'other'
+        });
         return acc;
       }, {} as Record<string, Attachment[]>) || {};
       
@@ -111,8 +120,15 @@ class ChatService {
         .in('id', senderIds);
         
       if (profilesError) throw profilesError;
+
+      // Ajouter la propriété 'name' aux profils pour compatibilité avec User
+      const enhancedProfiles = (profiles || []).map(profile => ({
+        ...profile,
+        role: profile.role as 'student' | 'teacher' | 'staff',
+        name: profile.full_name || profile.username || profile.id
+      }));
       
-      const profileMap = (profiles || []).reduce((acc, profile) => {
+      const profileMap = enhancedProfiles.reduce((acc, profile) => {
         acc[profile.id] = profile;
         return acc;
       }, {} as Record<string, Profile>);
@@ -120,9 +136,12 @@ class ChatService {
       // Combiner les messages avec les expéditeurs et les pièces jointes
       const messagesWithSenders = messages.map(message => ({
         ...message,
+        senderId: message.sender_id, // Ajout pour compatibilité
+        status: message.status as 'sent' | 'pending' | 'failed',
+        type: (message.type || 'text') as 'text' | 'voice' | 'emoji',
         sender: message.sender_id ? profileMap[message.sender_id] || null : null,
         attachments: attachmentsByMessage[message.id] || []
-      }));
+      })) as MessageWithSender[];
       
       return messagesWithSenders;
     } catch (error) {
@@ -286,6 +305,14 @@ class ChatService {
         .single();
         
       if (messageError) throw messageError;
+
+      // Adaptation du message pour la compatibilité
+      const enhancedMessage = {
+        ...message,
+        senderId: message.sender_id,
+        status: message.status as 'sent' | 'pending' | 'failed',
+        type: (message.type || 'text') as 'text' | 'voice' | 'emoji'
+      };
       
       // Mettre à jour la date de dernière modification de la conversation
       await supabase
@@ -338,17 +365,17 @@ class ChatService {
               
             if (attachmentError) throw attachmentError;
             
-            return attachment;
+            return attachment as Attachment;
           })
         );
         
         return {
-          ...message,
+          ...enhancedMessage,
           attachments
-        } as any;
+        } as Message;
       }
       
-      return message;
+      return enhancedMessage as Message;
     } catch (error) {
       console.error("Failed to send message:", error);
       toast.error("Impossible d'envoyer le message", {
@@ -397,7 +424,14 @@ class ChatService {
             .select('*')
             .eq('id', newMessage.sender_id)
             .single();
-          sender = data;
+
+          if (data) {
+            sender = {
+              ...data,
+              name: data.full_name || data.username || data.id,
+              role: data.role as 'student' | 'teacher' | 'staff',
+            };
+          }
         }
         
         // Obtenir les pièces jointes du message
@@ -406,10 +440,18 @@ class ChatService {
           .select('*')
           .eq('message_id', newMessage.id);
         
+        const typedAttachments = (attachments || []).map(att => ({
+          ...att,
+          type: att.type as 'image' | 'document' | 'voice' | 'other'
+        }));
+        
         callback({
           ...newMessage,
+          senderId: newMessage.sender_id,
+          status: newMessage.status as 'sent' | 'pending' | 'failed',
+          type: (newMessage.type || 'text') as 'text' | 'voice' | 'emoji',
           sender,
-          attachments: attachments || []
+          attachments: typedAttachments
         });
       })
       .subscribe();
@@ -485,7 +527,12 @@ class ChatService {
         
       if (error) throw error;
       
-      return data || [];
+      // Ajouter la propriété 'name' aux profils pour compatibilité avec User
+      return (data || []).map(profile => ({
+        ...profile,
+        role: profile.role as 'student' | 'teacher' | 'staff',
+        name: profile.full_name || profile.username || profile.id
+      }));
     } catch (error) {
       console.error("Failed to search users:", error);
       throw error;
