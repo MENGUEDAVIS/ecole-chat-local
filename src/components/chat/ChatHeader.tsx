@@ -12,15 +12,16 @@ import {
   Users
 } from "lucide-react";
 import Avatar from "./Avatar";
-import { Conversation } from "@/types/chat";
+import { ConversationWithParticipants } from "@/services/ChatService";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import PinnedMessages from "./PinnedMessages";
+import { MessageWithSender } from "@/services/ChatService";
 
 interface ChatHeaderProps {
-  conversation: Conversation;
+  conversation: ConversationWithParticipants;
   isConnected: boolean;
   onToggleSidebar: () => void;
   onInitiateCall?: (isVideo?: boolean) => void;
@@ -78,7 +79,22 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
     if (onInitiateCall) onInitiateCall(true);
   };
 
-  const isPinnedMessages = conversation.pinnedMessages && conversation.pinnedMessages.length > 0;
+  // Convertir les messages épinglés au format MessageWithSender
+  const pinnedMessages = conversation.messages 
+    ? conversation.messages
+        .filter(msg => msg.isPinned || msg.is_pinned)
+        .map(msg => ({
+          ...msg,
+          sender_id: msg.senderId || msg.sender_id || null,
+          timestamp: msg.timestamp || new Date().toISOString(),
+          status: (msg.status || 'sent') as 'sent' | 'pending' | 'failed',
+          type: (msg.type || 'text') as 'text' | 'voice' | 'emoji',
+          is_pinned: true,
+          sender: msg.sender || null
+        }))
+    : [];
+
+  const isPinnedMessages = pinnedMessages.length > 0;
 
   return (
     <>
@@ -94,9 +110,9 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
           )}
           
           <Avatar
-            src={conversation.avatar}
-            alt={conversation.name}
-            status={conversation.type === "private" ? conversation.participants[0]?.status : undefined}
+            src={conversation.avatar_url || undefined}
+            alt={conversation.name || ''}
+            status={conversation.type === "private" && conversation.participants[0] ? conversation.participants[0].status as "online" | "offline" | undefined : undefined}
           />
           
           <div className="ml-3">
@@ -223,7 +239,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
       {showPinned && isPinnedMessages && (
         <div className="border-b border-gray-200 bg-ecole-primary/5 p-2 animate-fade-in">
           <PinnedMessages 
-            messages={conversation.pinnedMessages || []}
+            messages={pinnedMessages as MessageWithSender[]}
             conversation={conversation}
             onClose={() => setShowPinned(false)}
           />

@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Conversation, Message, Profile, ConversationParticipant, Attachment } from "@/types/supabase";
 import { toast } from "@/components/ui/sonner";
@@ -60,8 +61,10 @@ class ChatService {
           // Ajouter la propriété 'name' aux profils pour compatibilité avec User
           const enhancedProfiles = (profiles || []).map(profile => ({
             ...profile,
+            role: profile.role as 'student' | 'teacher' | 'staff',
+            status: profile.status as 'online' | 'offline',
             name: profile.full_name || profile.username || profile.id
-          }));
+          } as Profile));
           
           return {
             ...conversation,
@@ -125,8 +128,9 @@ class ChatService {
       const enhancedProfiles = (profiles || []).map(profile => ({
         ...profile,
         role: profile.role as 'student' | 'teacher' | 'staff',
+        status: profile.status as 'online' | 'offline',
         name: profile.full_name || profile.username || profile.id
-      }));
+      } as Profile));
       
       const profileMap = enhancedProfiles.reduce((acc, profile) => {
         acc[profile.id] = profile;
@@ -531,8 +535,9 @@ class ChatService {
       return (data || []).map(profile => ({
         ...profile,
         role: profile.role as 'student' | 'teacher' | 'staff',
+        status: profile.status as 'online' | 'offline',
         name: profile.full_name || profile.username || profile.id
-      }));
+      } as Profile));
     } catch (error) {
       console.error("Failed to search users:", error);
       throw error;

@@ -1,10 +1,8 @@
-
 import React, { useState, useEffect, useCallback } from "react";
 import ThemeToggle from "@/components/chat/ThemeToggle";
 import Sidebar from "@/components/chat/Sidebar";
 import ChatArea from "@/components/chat/ChatArea";
 import ActionsSidebar from "@/components/chat/ActionsSidebar";
-import { Conversation, Message, User } from "@/types/chat";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "react-router-dom";
@@ -84,7 +82,14 @@ const Index = () => {
             .select('*');
           
           if (data) {
-            setUsers(data);
+            // Assurez-vous que les données ont le bon type
+            const typedProfiles: Profile[] = data.map(profile => ({
+              ...profile,
+              role: profile.role as 'student' | 'teacher' | 'staff',
+              status: profile.status as 'online' | 'offline',
+              name: profile.full_name || profile.username || profile.id
+            }));
+            setUsers(typedProfiles);
           }
         } catch (error) {
           console.error('Error loading users:', error);
@@ -387,7 +392,13 @@ const Index = () => {
         .single();
       
       if (data) {
-        setCallerProfile(data);
+        const typedProfile: Profile = {
+          ...data,
+          role: data.role as 'student' | 'teacher' | 'staff',
+          status: data.status as 'online' | 'offline',
+          name: data.full_name || data.username || data.id
+        };
+        setCallerProfile(typedProfile);
         setIncomingCallData({ callId, callerId, isVideo });
         setIsIncomingCall(true);
       }
