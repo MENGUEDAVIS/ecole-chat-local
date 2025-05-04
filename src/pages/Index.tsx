@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from "react";
 import ThemeToggle from "@/components/chat/ThemeToggle";
 import Sidebar from "@/components/chat/Sidebar";
@@ -526,11 +525,13 @@ const Index = () => {
       chatbotEnabled: conversation.chatbot_enabled,
       isPinned: conversation.is_pinned,
       createdBy: conversation.created_by,
+      // Add properties required for compatibility
       created_at: conversation.created_at,
       updated_at: conversation.updated_at,
       avatar_url: conversation.avatar_url,
       is_pinned: conversation.is_pinned,
-      chatbot_enabled: conversation.chatbot_enabled
+      chatbot_enabled: conversation.chatbot_enabled,
+      created_by: conversation.created_by
     };
   };
 
@@ -574,7 +575,7 @@ const Index = () => {
       
       <div className="flex flex-col flex-1 h-full">
         <ChatArea
-          conversation={selectedConversation ? conversationToBase(selectedConversation) : null}
+          conversation={selectedConversation}
           currentUser={profile}
           users={users}
           isConnected={isConnected}

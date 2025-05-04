@@ -115,7 +115,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
             <div
               className={cn(
                 "p-3 rounded-lg shadow-sm",
-                message.isPinned ? "border-l-2 border-ecole-primary" : "",
+                message.is_pinned ? "border-l-2 border-ecole-primary" : "",
                 isCurrentUser
                   ? "bg-ecole-userMessage text-ecole-text rounded-br-none"
                   : "bg-ecole-otherMessage text-ecole-text rounded-bl-none"
@@ -138,7 +138,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                   <DropdownMenuContent side={isCurrentUser ? "left" : "right"}>
                     <DropdownMenuItem onClick={onPinMessage} className="flex items-center gap-2">
                       <Pin size={14} />
-                      <span>{message.isPinned ? "Retirer l'épingle" : "Épingler"}</span>
+                      <span>{message.is_pinned ? "Retirer l'épingle" : "Épingler"}</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -156,7 +156,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
             {isCurrentUser && message.status === "pending" && (
               <Clock size={12} className="ml-1 text-ecole-offline" />
             )}
-            {message.isPinned && (
+            {message.is_pinned && (
               <Pin size={12} className="ml-1 text-ecole-primary" />
             )}
           </div>
