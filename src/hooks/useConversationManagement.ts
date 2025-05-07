@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { toast } from "@/components/ui/sonner";
 import { chatService, ConversationWithParticipants, MessageWithSender } from "@/services/ChatService";
@@ -207,7 +206,7 @@ export function useConversationManagement(userId: string | undefined, profile: P
   // Convert Profile to User
   const profileToUser = (profile: Profile): User => ({
     id: profile.id,
-    name: profile.name || profile.full_name || profile.username || profile.id,
+    name: profile.full_name || profile.username || profile.id,  // Ensuring name is always defined
     avatar: profile.avatar_url || undefined,
     status: profile.status as "online" | "offline",
     role: profile.role,

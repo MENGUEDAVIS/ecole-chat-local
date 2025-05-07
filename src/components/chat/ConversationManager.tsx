@@ -7,6 +7,7 @@ import { useConnection } from "@/contexts/ConnectionContext";
 import { useCallManagement } from "@/hooks/useCallManagement";
 import { useConversationManagement } from "@/hooks/useConversationManagement";
 import { Profile } from "@/types/supabase";
+import { User } from "@/types/chat";
 import CallDialog from "@/components/chat/CallDialog";
 import CallScreen from "@/components/chat/CallScreen";
 
@@ -28,8 +29,8 @@ interface ConversationManagerProps {
     onStartConversation: (recipient: Profile) => void;
     onCreateGroup: (name: string, participants: Profile[], category: "project" | "club" | "class" | "other", visibility: "private" | "public" | "moderated", description?: string) => void;
     onInitiateCall: (isVideo?: boolean) => void;
-    profileToUser: (profile: Profile) => any;
-    profilesToUsers: (profiles: Profile[]) => any[];
+    profileToUser: (profile: Profile) => User;
+    profilesToUsers: (profiles: Profile[]) => User[];
     conversationsToBase: (conversations: any[]) => any[];
   }) => React.ReactNode;
 }

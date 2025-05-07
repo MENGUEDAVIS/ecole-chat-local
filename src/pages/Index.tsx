@@ -6,6 +6,8 @@ import ChatArea from "@/components/chat/ChatArea";
 import ActionsSidebar from "@/components/chat/ActionsSidebar";
 import { ConnectionProvider } from "@/contexts/ConnectionContext";
 import ConversationManager from "@/components/chat/ConversationManager";
+import { User, Conversation } from "@/types/chat";
+import { Profile } from "@/types/supabase";
 
 const Index = () => {
   return (
@@ -28,6 +30,7 @@ const Index = () => {
           onStartConversation,
           onCreateGroup,
           onInitiateCall,
+          profileToUser,
           profilesToUsers,
           conversationsToBase
         }) => (
@@ -36,13 +39,21 @@ const Index = () => {
               isOpen={isActionSidebarOpen}
               onToggle={onToggleActionSidebar}
               users={profilesToUsers(users)}
-              currentUser={users.find(u => u.id === selectedConversation?.created_by) || null}
-              onStartConversation={onStartConversation}
+              currentUser={users.find(u => u.id === selectedConversation?.created_by) ? 
+                profileToUser(users.find(u => u.id === selectedConversation?.created_by) as Profile) : 
+                null}
+              onStartConversation={(user: User) => {
+                // Find the corresponding Profile and pass it
+                const targetProfile = users.find(p => p.id === user.id);
+                if (targetProfile) {
+                  onStartConversation(targetProfile);
+                }
+              }}
               onCreateGroup={(name, participantsUsers, category, visibility, description) => {
                 // Convert User[] back to Profile[]
                 const participantProfiles = participantsUsers.map(u => 
                   users.find(p => p.id === u.id)
-                ).filter(Boolean) as any[];
+                ).filter(Boolean) as Profile[];
                 onCreateGroup(name, participantProfiles, category, visibility, description);
               }}
             />
@@ -50,7 +61,9 @@ const Index = () => {
             <Sidebar
               users={profilesToUsers(users)}
               conversations={conversationsToBase(conversations)}
-              currentUser={users.find(u => u.id === selectedConversation?.created_by) || null}
+              currentUser={users.find(u => u.id === selectedConversation?.created_by) ? 
+                profileToUser(users.find(u => u.id === selectedConversation?.created_by) as Profile) : 
+                null}
               isConnected={isConnected}
               onSelectConversation={onSelectConversation}
               selectedConversationId={selectedConversation?.id || null}
